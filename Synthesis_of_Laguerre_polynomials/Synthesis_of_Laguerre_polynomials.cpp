@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <vector>
 #include <map>
+#include <fstream>
 
 using namespace std;
 
@@ -26,7 +27,8 @@ void PrintPolynomial(const Polynomial& polynom) {
     for (const auto& [exponent, coefficient] : polynom) {
         if (exponent == 0) {
             cout << coefficient;
-        } else {
+        }
+        else {
             if (coefficient > 0) {
                 cout << "+"s << coefficient << "x^"s << exponent;
             }
@@ -35,6 +37,30 @@ void PrintPolynomial(const Polynomial& polynom) {
             }
         }
     }
+}
+
+// Запись в .txt файл коэффициентов сгенерированных полиномов Лагерра
+void WriteAllPolynomialsToTxt(const vector<Polynomial>& all_polynom) {
+    ofstream Laguerre_polynomials;
+    Laguerre_polynomials.open("Laguerre_polynomials.txt"s);
+    for (const Polynomial& polynom : all_polynom) {
+        vector<double> polynom_to_txt(all_polynom.size(), 0);
+        for (const auto& [exponent, coefficient] : polynom) {
+            polynom_to_txt[exponent] = coefficient;
+        }
+        reverse(polynom_to_txt.begin(), polynom_to_txt.end()); // т.к. в map от меньшего к большему
+        bool flag = true;
+        for (const double& coefficient_polynom : polynom_to_txt) {
+            if (flag) {
+                Laguerre_polynomials << coefficient_polynom;
+                flag = false;
+            } else {
+                Laguerre_polynomials << ", "s << coefficient_polynom;
+            }
+        }
+        Laguerre_polynomials << endl;
+    }
+    Laguerre_polynomials.close();
 }
 
 void PrintAllPolynomials(const vector<Polynomial>& all_polynom) {
@@ -110,5 +136,6 @@ int main()
     Laguerre_polynomials[1] = { {0,1}, {1,-1} };
     SynthesisLaguerrePolynomials(Laguerre_polynomials);
     PrintAllPolynomials(Laguerre_polynomials);
+    WriteAllPolynomialsToTxt(Laguerre_polynomials);
     return 0;
 }
