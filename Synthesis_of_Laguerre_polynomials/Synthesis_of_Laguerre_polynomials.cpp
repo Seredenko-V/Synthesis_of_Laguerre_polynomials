@@ -69,6 +69,15 @@ map<int32_t, double> operator*(Value value, const map<int32_t, double>& polynomi
     return result;
 }
 
+template <typename Value>
+map<int32_t, double> operator/(const map<int32_t, double>& polynomial, Value value) {
+    map<int32_t, double> result = polynomial;
+    for (const auto& [exponent, coefficient] : result) {
+        result[exponent] = coefficient / value;
+    }
+    return result;
+}
+
 map<int32_t, double> operator-(const map<int32_t, double>& first, const map<int32_t, double>& second) {
     map<int32_t, double> result = first;
     for (const auto& [exponent, coefficient] : second) {
@@ -79,25 +88,25 @@ map<int32_t, double> operator-(const map<int32_t, double>& first, const map<int3
 
 void SynthesisLaguerrePolynomials(vector<map<int32_t, double>>& all_polynom) {
     for (size_t i = 2; i < all_polynom.size(); ++i) {
-        map<int32_t, double> tmp_polynom = { {0, 2 * i - 1}, {1, 1} };
-        //all_polynom[i] = ((tmp_polynom * all_polynom[i - 1]) - ((i - 1) * all_polynom[i - 2])) / i;
+        map<int32_t, double> tmp_polynom = { {0, 2 * i - 1}, {1, -1} };
+        all_polynom[i] = ((tmp_polynom * all_polynom[i - 1]) - ((i - 1) * all_polynom[i - 2])) / i;
     }
-    map<int32_t, double> a = { {5,1}, {4,2}, {3,3}, {2,4}, {1,2} };
-    map<int32_t, double> b = { {3,1}, {2,1}, {1,3}, {0,3} };
-    map<int32_t, double> mult = b - a;
-    PrintPolynomial(mult);
+    //map<int32_t, double> a = { {5,1}, {4,2}, {3,3}, {2,4}, {1,2} };
+    //map<int32_t, double> b = { {3,1}, {2,1}, {1,3}, {0,3} };
+    //map<int32_t, double> mult = a / 2;
+    //PrintPolynomial(mult);
 }
 
 int main()
 {
     const double alpha = 0; // параметр масштаба
     const size_t min_quantity_polynomials = 2; // минимально допустимое число полиномов Лагерра
-    const size_t quantity_polynomials = 2;
+    const size_t quantity_polynomials = 7;
     ASSERT_HINT(quantity_polynomials >= min_quantity_polynomials, "Incorrect number of polynomials. Their number should not be less than 2."s);
     vector<map<int32_t, double>> Laguerre_polynomials(quantity_polynomials); // все полиномы Лагерра
     Laguerre_polynomials[0] = { {0,1} };
     Laguerre_polynomials[1] = { {0,1}, {1,-1} };
-    PrintAllPolynomials(Laguerre_polynomials);
     SynthesisLaguerrePolynomials(Laguerre_polynomials);
+    PrintAllPolynomials(Laguerre_polynomials);
     return 0;
 }
