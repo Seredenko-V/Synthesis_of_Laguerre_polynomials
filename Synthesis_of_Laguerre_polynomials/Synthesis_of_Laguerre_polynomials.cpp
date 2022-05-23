@@ -57,7 +57,6 @@ map<int32_t, double> operator*(const map<int32_t, double>& first, const map<int3
             result[exponent_first + exponent_second] += coefficient_first * coefficient_second;
         }
     }
-    PrintPolynomial(result);
     return result;
 }
 
@@ -67,13 +66,15 @@ map<int32_t, double> operator*(Value value, const map<int32_t, double>& polynomi
     for (const auto& [exponent, coefficient] : result) {
         result[exponent] = coefficient * value;
     }
-    PrintPolynomial(result);
     return result;
 }
 
 map<int32_t, double> operator-(const map<int32_t, double>& first, const map<int32_t, double>& second) {
-    map<int32_t, double> result;
-
+    map<int32_t, double> result = first;
+    for (const auto& [exponent, coefficient] : second) {
+        result[exponent] -= coefficient;
+    }
+    return result;
 }
 
 void SynthesisLaguerrePolynomials(vector<map<int32_t, double>>& all_polynom) {
@@ -81,9 +82,10 @@ void SynthesisLaguerrePolynomials(vector<map<int32_t, double>>& all_polynom) {
         map<int32_t, double> tmp_polynom = { {0, 2 * i - 1}, {1, 1} };
         //all_polynom[i] = ((tmp_polynom * all_polynom[i - 1]) - ((i - 1) * all_polynom[i - 2])) / i;
     }
-    map<int32_t, double> a = { {2,1}, {1,2}, {0,1} };
-    map<int32_t, double> b = { {3,1}, {1,2} };
-    map<int32_t, double> mult = a * b;
+    map<int32_t, double> a = { {5,1}, {4,2}, {3,3}, {2,4}, {1,2} };
+    map<int32_t, double> b = { {3,1}, {2,1}, {1,3}, {0,3} };
+    map<int32_t, double> mult = b - a;
+    PrintPolynomial(mult);
 }
 
 int main()
