@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <vector>
+#include <string>
 #include <map>
 #include <fstream>
 
@@ -40,9 +41,9 @@ void PrintPolynomial(const Polynomial& polynom) {
 }
 
 // Запись в .txt файл коэффициентов сгенерированных полиномов Лагерра
-void WriteAllPolynomialsToTxt(const vector<Polynomial>& all_polynom) {
+void WriteAllPolynomialsToTxt(const vector<Polynomial>& all_polynom, const string& file_name) {
     ofstream Laguerre_polynomials;
-    Laguerre_polynomials.open("Laguerre_polynomials.txt"s);
+    Laguerre_polynomials.open(file_name + ".txt"s);
     for (const Polynomial& polynom : all_polynom) {
         vector<double> polynom_to_txt(all_polynom.size(), 0);
         for (const auto& [exponent, coefficient] : polynom) {
@@ -89,17 +90,6 @@ Polynomial operator/(const Polynomial& polynomial, Value value) {
     return result;
 }
 
-//map<int32_t, double> operator/(const map<int32_t, double>& divisible, const map<int32_t, double>& divider) {
-//    ASSERT_HINT(divider.rbegin()->first < divisible.rbegin()->first, 
-// "The highest degree of the divisor must be less than or equal to the degree of the divisible"s);
-//    //cout << "divider.rbegin()->first = "s << divider.rbegin()->first << endl;
-//    //cout << "divisible.rbegin()->first = "s << divisible.rbegin()->first << endl;
-//    map<int32_t, double> result = divisible;
-//    
-//    
-//    return result;
-//}
-
 Polynomial operator-(const Polynomial& first, const Polynomial& second) {
     Polynomial result = first;
     for (const auto& [exponent, coefficient] : second) {
@@ -113,29 +103,30 @@ map<int32_t, double> ValueToMap(Value value) {
     return { {0, static_cast<double>(value)} };
 }
 
-void SynthesisLaguerrePolynomials(vector<Polynomial>& all_polynom, const double alpha) {
-    for (size_t i = 2; i < all_polynom.size(); ++i) {
-        Polynomial tmp_polynom = { {0, 2 * i - 1 + alpha}, {1, -1} };
-        all_polynom[i] = ((tmp_polynom * all_polynom[i - 1]) - (ValueToMap(i - 1 + alpha) * all_polynom[i - 2])) / i;
-    }
-    //map<int32_t, double> a = { {5,1}, {4,2}, {3,3}, {2,4}, {1,2} };
-    //map<int32_t, double> b = { {3,1}, {2,1}, {1,3}, {0,3} };
-    //map<int32_t, double> mult = a / b;
-    //PrintPolynomial(mult);
-}
-
-int main()
-{
-    const double alpha = 1; // параметр масштаба
+// Синтез quantity_polynomials полиномов Лаггера
+vector<Polynomial> SynthesisLaguerrePolynomials(const double alpha, const int32_t quantity_polynomials) {
     const size_t min_quantity_polynomials = 2; // минимально допустимое число полиномов Лагерра
-    const size_t quantity_polynomials = 7;
-    ASSERT_HINT(quantity_polynomials >= min_quantity_polynomials, 
+    ASSERT_HINT(quantity_polynomials >= static_cast<int32_t>(min_quantity_polynomials),
         "Incorrect number of polynomials. Their number should not be less than 2."s);
     vector<Polynomial> Laguerre_polynomials(quantity_polynomials); // все полиномы Лагерра
     Laguerre_polynomials[0] = { {0,1} };
     Laguerre_polynomials[1] = { {0,1 + alpha}, {1,-1} };
-    SynthesisLaguerrePolynomials(Laguerre_polynomials, alpha);
+    for (size_t i = 2; i < Laguerre_polynomials.size(); ++i) {
+        Polynomial tmp_polynom = { {0, 2 * i - 1 + alpha}, {1, -1} };
+        Laguerre_polynomials[i] = ((tmp_polynom * Laguerre_polynomials[i - 1]) - (ValueToMap(i - 1 + alpha) 
+            * Laguerre_polynomials[i - 2])) / i;
+    }
+    return Laguerre_polynomials;
+}
+
+int main()
+{
+    const double alpha = 0; // параметр масштаба
+    const int32_t quantity_polynomials = 5; // количество генерируемых полиномов
+    // все полиномы Лагерра
+    vector<Polynomial> Laguerre_polynomials = SynthesisLaguerrePolynomials(alpha, quantity_polynomials); 
     PrintAllPolynomials(Laguerre_polynomials);
-    WriteAllPolynomialsToTxt(Laguerre_polynomials);
+    WriteAllPolynomialsToTxt(Laguerre_polynomials, "Laguerre_polynomials__alpha="s + to_string(alpha) + "_n="s +
+        to_string(quantity_polynomials));
     return 0;
 }
