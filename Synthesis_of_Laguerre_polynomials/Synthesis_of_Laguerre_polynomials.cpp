@@ -113,10 +113,10 @@ map<int32_t, double> ValueToMap(Value value) {
     return { {0, static_cast<double>(value)} };
 }
 
-void SynthesisLaguerrePolynomials(vector<Polynomial>& all_polynom) {
+void SynthesisLaguerrePolynomials(vector<Polynomial>& all_polynom, const double alpha) {
     for (size_t i = 2; i < all_polynom.size(); ++i) {
-        Polynomial tmp_polynom = { {0, 2 * i - 1}, {1, -1} };
-        all_polynom[i] = ((tmp_polynom * all_polynom[i - 1]) - (ValueToMap(i - 1) * all_polynom[i - 2])) / i;
+        Polynomial tmp_polynom = { {0, 2 * i - 1 + alpha}, {1, -1} };
+        all_polynom[i] = ((tmp_polynom * all_polynom[i - 1]) - (ValueToMap(i - 1 + alpha) * all_polynom[i - 2])) / i;
     }
     //map<int32_t, double> a = { {5,1}, {4,2}, {3,3}, {2,4}, {1,2} };
     //map<int32_t, double> b = { {3,1}, {2,1}, {1,3}, {0,3} };
@@ -126,15 +126,15 @@ void SynthesisLaguerrePolynomials(vector<Polynomial>& all_polynom) {
 
 int main()
 {
-    const double alpha = 0; // параметр масштаба
+    const double alpha = 1; // параметр масштаба
     const size_t min_quantity_polynomials = 2; // минимально допустимое число полиномов Лагерра
     const size_t quantity_polynomials = 7;
     ASSERT_HINT(quantity_polynomials >= min_quantity_polynomials, 
         "Incorrect number of polynomials. Their number should not be less than 2."s);
     vector<Polynomial> Laguerre_polynomials(quantity_polynomials); // все полиномы Лагерра
     Laguerre_polynomials[0] = { {0,1} };
-    Laguerre_polynomials[1] = { {0,1}, {1,-1} };
-    SynthesisLaguerrePolynomials(Laguerre_polynomials);
+    Laguerre_polynomials[1] = { {0,1 + alpha}, {1,-1} };
+    SynthesisLaguerrePolynomials(Laguerre_polynomials, alpha);
     PrintAllPolynomials(Laguerre_polynomials);
     WriteAllPolynomialsToTxt(Laguerre_polynomials);
     return 0;
